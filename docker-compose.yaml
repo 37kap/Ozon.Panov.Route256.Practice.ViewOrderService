@@ -1,0 +1,172 @@
+volumes:
+  panov-k_customer-service-db:
+  panov-k_order-service-db:
+  panov-k_view-orders-db-shard-1:
+  panov-k_view-orders-db-shard-2:
+
+services:
+  order-service-db:
+    image: postgres:latest
+    container_name: order-service-db
+    ports:
+      - "5435:5435"
+    command:
+      -p 5435
+    environment:
+      POSTGRES_DB: order-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - panov-k_order-service-db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d order-service-db -p 5435" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  order-service:
+    pull_policy: build
+    container_name: order-service
+    build:
+      context: ./external/order-service/Ozon.Route256.OrderService/Ozon.Route256.OrderService
+      dockerfile: Dockerfile
+    image: order-service:latest
+    ports:
+      - "8083:5001"
+      - "8084:5002"
+    depends_on:
+      order-service-db:
+        condition: service_healthy
+      kafka-setup:
+        condition: service_completed_successfully
+    environment:
+      ROUTE256_KAFKA_BROKERS: "broker-1:29091,broker-2:29092"
+      ROUTE256_ORDER_SERVICE_DB_CONNECTION_STRING: "Server=order-service-db;User Id=postgres;Password=password;Port=5435;Database=order-service-db;"
+
+  zookeeper:
+    image: zookeeper:latest
+    container_name: zookeeper
+    restart: always
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
+    ports:
+      - "2181:2181"
+
+  broker-1:
+    image: bitnami/kafka:3.9
+    container_name: broker-1
+    restart: always
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CFG_LISTENERS: CLIENT://:29091,EXTERNAL://:9091
+      KAFKA_CFG_ADVERTISED_LISTENERS: CLIENT://broker-1:29091,EXTERNAL://broker-1:9091
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: CLIENT
+    ports:
+      - "9091:9091"
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--list", "--bootstrap-server", "broker-1:29091"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  broker-2:
+    image: bitnami/kafka:3.9
+    container_name: broker-2
+    restart: always
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CFG_LISTENERS: CLIENT://:29092,EXTERNAL://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: CLIENT://broker-2:29092,EXTERNAL://broker-2:9092
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: CLIENT
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--list", "--bootstrap-server", "broker-2:29092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka-setup:
+      image: bitnami/kafka:3.9
+      depends_on:
+        broker-1:
+          condition: service_healthy
+        broker-2:
+          condition: service_healthy
+      command: >
+        bash -c "
+          kafka-topics.sh --create --topic orders_input --partitions 3 --replication-factor 2 --if-not-exists --bootstrap-server broker-1:29091 && 
+          kafka-topics.sh --create --topic orders_input_errors --partitions 3 --replication-factor 2 --if-not-exists --bootstrap-server broker-1:29091 && 
+          kafka-topics.sh --create --topic order_output_events --partitions 3 --replication-factor 2 --if-not-exists --bootstrap-server broker-1:29091"
+
+  view-order-service-db-shard-1:
+    image: postgres:latest
+    container_name: view-order-service-db-shard-1
+    ports:
+      - "7432:5432"
+    environment:
+      POSTGRES_USER: postgres_1_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: view-order-service-db-shard-1
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - panov-k_view-orders-db-shard-1:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres_1_user -d view-order-service-db-shard-1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+  view-order-service-db-shard-2:
+    image: postgres:latest
+    container_name: view-order-service-db-shard-2
+    ports:
+      - "7433:5432"
+    environment:
+      POSTGRES_USER: postgres_2_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: view-order-service-db-shard-2
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - panov-k_view-orders-db-shard-2:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres_2_user -d view-order-service-db-shard-2" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5  
+
+  view-order-service:
+    pull_policy: build
+    container_name: view-order-service
+    build:
+      context: .
+      dockerfile: ./src/Ozon.Panov.Route256.Practice.ViewOrderService/Dockerfile
+    image: view-order-service:latest
+    depends_on:
+      view-order-service-db-shard-1:
+        condition: service_healthy
+      view-order-service-db-shard-2:
+        condition: service_healthy
+      order-service:
+        condition: service_started
+      kafka-setup:
+        condition: service_completed_successfully
+    ports:
+      - "8096:5002"
+    environment:
+      ROUTE256_VIEW_ORDER_SERVICE_DB_SHARD1_CONNECTION_STRINGS: "Server=view-order-service-db-shard-1;Port=5432;User Id=postgres_1_user;Password=password;Database=view-order-service-db-shard-1;"
+      ROUTE256_VIEW_ORDER_SERVICE_DB_SHARD2_CONNECTION_STRINGS: "Server=view-order-service-db-shard-2;Port=5432;User Id=postgres_2_user;Password=password;Database=view-order-service-db-shard-2;"
+      ROUTE256_VIEW_ORDER_SERVICE_DB_BUCKETS_PER_SHARD: 5
+      ROUTE256_KAFKA_BROKERS: "broker-1:29091,broker-2:29092"
+      ROUTE256_ORDER_SERVICE_URL: "http://order-service:5002"

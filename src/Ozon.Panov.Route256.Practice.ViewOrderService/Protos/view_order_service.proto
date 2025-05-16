@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package ozon.panov.route256.practice.view_order_service.view_order_service_grpc;
+option csharp_namespace = "Ozon.Panov.Route256.Practice.ViewOrderService.ViewOrderServiceGrpc";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+
+service ViewOrderServiceGrpc {
+  rpc V1AddOrder (V1AddOrderRequest) returns (V1AddOrderResponse);
+  rpc V1UpdateOrder (V1UpdateOrderRequest) returns (V1UpdateOrderResponse);
+  rpc V1QueryOrder (V1QueryOrderRequest) returns (V1QueryOrderResponse);
+}
+
+message V1AddOrderRequest {
+  int64 order_id = 1;
+  int64 region_id = 2;
+  int32 status = 3;
+  int64 customer_id = 4;
+  google.protobuf.StringValue comment = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message V1AddOrderResponse {
+  
+}
+
+message V1UpdateOrderRequest {
+  int64 order_id = 1;
+  int64 region_id = 2;
+  int32 status = 3;
+  int64 customer_id = 4;
+  google.protobuf.StringValue comment = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message V1UpdateOrderResponse {
+  
+}
+
+message V1QueryOrderRequest {
+  repeated int64 order_ids = 1;
+  repeated int64 region_ids = 2;
+  repeated int64 customer_ids = 3;
+  int32 limit = 4;
+  int32 offset = 5;
+}
+
+message V1QueryOrderResponse {
+  repeated Order orders = 1;
+  
+  message Order {
+    int64 order_id = 1;
+    int64 region_id = 2;
+    int32 status = 3;
+    int64 customer_id = 4;
+    google.protobuf.StringValue comment = 5;
+    google.protobuf.Timestamp created_at = 6;
+  }
+}

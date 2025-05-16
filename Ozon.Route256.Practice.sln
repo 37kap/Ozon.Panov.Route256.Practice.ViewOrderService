@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3E8B1572-9AA4-4A88-87B9-90893D3EF083}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0C88DD14-F956-CE84-757C-A364CCF449FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{2BD45483-6E08-8D8D-8130-F11346EE9468}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		docker-compose.yaml = docker-compose.yaml
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Panov.Route256.Practice.ViewOrderService", "src\Ozon.Panov.Route256.Practice.ViewOrderService\Ozon.Panov.Route256.Practice.ViewOrderService.csproj", "{30DADA33-0C80-4C2E-8BCD-AEB3DBFEFB3A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "external", "external", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.OrderService", "..\Ozon.Route256.Practice\external\order-service\Ozon.Route256.OrderService\Ozon.Route256.OrderService\Ozon.Route256.OrderService.csproj", "{04C83FA0-5D63-2E0C-B194-D7A824A4BA96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Panov.Route256.Practice.ViewOrderService.IntegrationTests", "tests\Ozon.Panov.Route256.Practice.ViewOrderService.IntegrationTests\Ozon.Panov.Route256.Practice.ViewOrderService.IntegrationTests.csproj", "{ABDF3D65-2E72-46D0-B8A9-AC4428387B95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Panov.Route256.Practice.ViewOrderService.UnitTests", "tests\Ozon.Panov.Route256.Practice.ViewOrderService.UnitTests\Ozon.Panov.Route256.Practice.ViewOrderService.UnitTests.csproj", "{B2DD4475-1426-4649-ADBC-9951D4EC4760}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30DADA33-0C80-4C2E-8BCD-AEB3DBFEFB3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30DADA33-0C80-4C2E-8BCD-AEB3DBFEFB3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30DADA33-0C80-4C2E-8BCD-AEB3DBFEFB3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30DADA33-0C80-4C2E-8BCD-AEB3DBFEFB3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04C83FA0-5D63-2E0C-B194-D7A824A4BA96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04C83FA0-5D63-2E0C-B194-D7A824A4BA96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04C83FA0-5D63-2E0C-B194-D7A824A4BA96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04C83FA0-5D63-2E0C-B194-D7A824A4BA96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABDF3D65-2E72-46D0-B8A9-AC4428387B95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABDF3D65-2E72-46D0-B8A9-AC4428387B95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABDF3D65-2E72-46D0-B8A9-AC4428387B95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABDF3D65-2E72-46D0-B8A9-AC4428387B95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2DD4475-1426-4649-ADBC-9951D4EC4760}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2DD4475-1426-4649-ADBC-9951D4EC4760}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2DD4475-1426-4649-ADBC-9951D4EC4760}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2DD4475-1426-4649-ADBC-9951D4EC4760}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{30DADA33-0C80-4C2E-8BCD-AEB3DBFEFB3A} = {3E8B1572-9AA4-4A88-87B9-90893D3EF083}
+		{04C83FA0-5D63-2E0C-B194-D7A824A4BA96} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+		{ABDF3D65-2E72-46D0-B8A9-AC4428387B95} = {0C88DD14-F956-CE84-757C-A364CCF449FC}
+		{B2DD4475-1426-4649-ADBC-9951D4EC4760} = {0C88DD14-F956-CE84-757C-A364CCF449FC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3B896050-164A-4995-87D4-E77543A9819E}
+	EndGlobalSection
+EndGlobal
